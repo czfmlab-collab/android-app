@@ -75,6 +75,20 @@ class CallsService(
         return telecomManager.endCall()
     }
 
+    @SuppressLint("MissingPermission")
+    @Suppress("DEPRECATION")
+    fun answerCall() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            throw UnsupportedOperationException("Answering calls requires Android 8.0 or newer")
+        }
+
+        if (!hasAnswerPermissions()) {
+            throw SecurityException("ANSWER_PHONE_CALLS permission not granted")
+        }
+
+        telecomManager.acceptRingingCall()
+    }
+
     fun processEvent(event: CallEvent) {
         val webhookEvent = when (event.type) {
             CallEvent.Type.Ringing -> WebHookEvent.CallRinging
