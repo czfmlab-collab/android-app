@@ -35,6 +35,20 @@ class CallsRoutes : KoinComponent {
             call.respond(HttpStatusCode.OK, PostCallsResponse(request.call))
         }
 
+        post("/answer") {
+            val currentCall = callsService.getCall()
+            if (currentCall.state != CallState.Ringing) {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    mapOf("message" to "No ringing call")
+                )
+                return@post
+            }
+
+            callsService.answerCall()
+            call.respond(HttpStatusCode.NoContent)
+        }
+
         delete("") {
             val currentCall = callsService.getCall()
             if (currentCall.state == CallState.Idle) {
